@@ -4,13 +4,17 @@ package com.hua.beautifulimage.ui.adapter;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.View;
 
 import com.hua.beautifulimage.ui.fragment.BaseFragment;
 
 import java.util.List;
 
+import in.srain.cube.views.ptr.PtrFrameLayout;
+
 /**
- * Created by ZHONG WEI  HUA on 2016/3/31.
+ * 主页适配器
  */
 public class PagerAdapter extends FragmentStatePagerAdapter {
 
@@ -34,6 +38,18 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         return mList.get(position).getTitle();
+    }
+
+    public boolean checkCanDoRefresh(int position, PtrFrameLayout frame, View content, View header) {
+        return getCurrentFragment(position).checkCanDoRefresh(frame, content, header);
+    }
+
+    private BaseFragment getCurrentFragment(int position) {
+        return (BaseFragment) getItem(position);
+    }
+
+    public void update(int position, SwipeRefreshLayout swipe){
+        getCurrentFragment(position).update(swipe);
     }
 
     public static class FragmentModel {

@@ -1,10 +1,19 @@
 package com.hua.beautifulimage.http;
 
+import android.content.Context;
+import android.support.v4.widget.SwipeRefreshLayout;
+
 import com.hua.beautifulimage.entity.Gallery;
+import com.hua.beautifulimage.entity.Pictures;
 import com.hua.beautifulimage.http.api.GalleryService;
+import com.hua.beautifulimage.http.api.PicturesService;
+import com.hua.beautifulimage.http.subscriber.LoaderSubscriber;
+import com.hua.beautifulimage.http.subscriber.SubscriberOnNextListener;
+import com.hua.beautifulimage.utils.Constants;
 
 import java.util.concurrent.TimeUnit;
 
+import in.srain.cube.views.ptr.PtrFrameLayout;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -23,9 +32,8 @@ public class HttpMethod {
     public static final int DEFAULT_CONNECT_TIME_OUT = 10;
     public static final int DEFAULT_READ_TIME_OUT = 30;
 
-    public static final int DEFAULT_ROWS = 10;
-
     private final GalleryService mGalleryService;
+    private final PicturesService mPicturesService;
 
     private static class HttpMethodHolder {
         public static final HttpMethod HTTP_METHOD = new HttpMethod();
@@ -49,17 +57,26 @@ public class HttpMethod {
                 .build();
 
         mGalleryService = retrofit.create(GalleryService.class);
+        mPicturesService = retrofit.create(PicturesService.class);
     }
 
-    public void queryGallery(Subscriber<Gallery> subscriber, int id, int page, int rows) {
+    public void queryGallery(Context context, SubscriberOnNextListener listener, SwipeRefreshLayout swipe, int id, int page, int rows) {
         mGalleryService.query(id, page, rows)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
+                .subscribe(new LoaderSubscriber<Gallery>(context, listener, swipe));
     }
 
-    public void queryGallery(Subscriber<Gallery> subscriber, int id, int page) {
-        queryGallery(subscriber, id, page, DEFAULT_ROWS);
+    public void queryGallery(Context context, SubscriberOnNextListener listener, SwipeRefreshLayout swipe, int id, int page) {
+        queryGallery(context, listener, swipe, id, page, Constants.DEFAULT_PAGE_ROWS);
+    }
+
+    public void show(Subscriber<Pictures> subscriber, int id) {
+        mPicturesService.show(id)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(subscriber);
     }
 }

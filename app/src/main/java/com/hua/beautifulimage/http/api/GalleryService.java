@@ -12,6 +12,6 @@ import rx.Observable;
 public interface GalleryService {
 
     @GET("list")
-    public Observable<Gallery> query(@Query("id")int id, @Query("page")int page, @Query("rows")int rows);
+    Observable<Gallery> query(@Query("id")int id, @Query("page")int page, @Query("rows")int rows);
 
 }
