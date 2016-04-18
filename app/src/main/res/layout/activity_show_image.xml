@@ -7,6 +7,7 @@
     tools:context="com.hua.beautifulimage.ui.activity.ShowImageActivity">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/show_app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -22,6 +23,24 @@
         android:id="@+id/show_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <FrameLayout
+        android:id="@+id/show_pager_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:visibility="gone">
+
+        <com.hua.beautifulimage.ui.view.HackyViewPager
+            android:id="@+id/show_hacky_view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
 
 </android.support.design.widget.CoordinatorLayout>
+
+
+
+

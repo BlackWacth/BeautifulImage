@@ -23,6 +23,8 @@ public class ShowPictureAdapter extends RecyclerView.Adapter<ShowPictureAdapter.
 
     private Context mContext;
     private List<Pictures.Picture> mList;
+    private OnItemClickListener mOnItemClickListener;
+
 
     public ShowPictureAdapter(Context mContext, List<Pictures.Picture> mList) {
         this.mContext = mContext;
@@ -36,9 +38,17 @@ public class ShowPictureAdapter extends RecyclerView.Adapter<ShowPictureAdapter.
     }
 
     @Override
-    public void onBindViewHolder(ShowPictureHolder holder, int position) {
+    public void onBindViewHolder(final ShowPictureHolder holder, final int position) {
         String uri = Constants.BASE_IMAGE_URL + mList.get(position).getSrc();
         ImageLoaderUtils.imageLoader(uri, holder.picture, holder.progressBar);
+        if (mOnItemClickListener != null) {
+            holder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnItemClickListener.onItemClick(holder.picture, position);
+                }
+            });
+        }
     }
 
     @Override
@@ -51,7 +61,15 @@ public class ShowPictureAdapter extends RecyclerView.Adapter<ShowPictureAdapter.
         return position;
     }
 
-    class ShowPictureHolder extends RecyclerView.ViewHolder{
+    public OnItemClickListener getOnItemClickListener() {
+        return mOnItemClickListener;
+    }
+
+    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener) {
+        this.mOnItemClickListener = mOnItemClickListener;
+    }
+
+    class ShowPictureHolder extends RecyclerView.ViewHolder {
 
         CardView cardView;
 

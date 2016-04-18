@@ -82,9 +82,5 @@ public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdap
             cardView = (CardView) itemView.findViewById(R.id.item_card_view);
         }
     }
-
-    public interface OnItemClickListener {
-        public void onItemClick(View v, int position);
-    }
 }
 

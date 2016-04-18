@@ -12,6 +12,7 @@ import com.hua.beautifulimage.entity.Gallery;
 import com.hua.beautifulimage.http.subscriber.SubscriberOnNextListener;
 import com.hua.beautifulimage.ui.activity.ShowImageActivity;
 import com.hua.beautifulimage.ui.adapter.ImageRecyclerAdapter;
+import com.hua.beautifulimage.ui.adapter.OnItemClickListener;
 import com.hua.beautifulimage.ui.view.SpacesItemDecoration;
 import com.hua.beautifulimage.utils.Constants;
 import com.hua.beautifulimage.utils.L;
@@ -74,7 +75,7 @@ public class ImageFragment extends BaseFragment {
 
         mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
-        mAdapter.setmOnItemClickListener(new ImageRecyclerAdapter.OnItemClickListener() {
+        mAdapter.setmOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View v, int position) {
                 Intent intent = new Intent(getActivity(), ShowImageActivity.class);
