@@ -1,5 +1,6 @@
 package com.hua.beautifulimage.ui.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,7 @@ import butterknife.Bind;
 /**
  * 性感美女
  */
+@SuppressLint("ValidFragment")
 public class ImageFragment extends BaseFragment {
 
     @Bind(R.id.sexy_recycler_view)

@@ -23,14 +23,14 @@ public class LoaderSubscriber<T> extends Subscriber<T>{
 
     @Override
     public void onCompleted() {
-        showToast("加载完成");
+//        showToast("加载完成");
         swipe.setRefreshing(false);
     }
 
     @Override
     public void onError(Throwable e) {
         L.e(e.getMessage());
-        showToast("网络异常");
+        showToast("网络异常" + e.getMessage());
         swipe.setRefreshing(false);
     }
 

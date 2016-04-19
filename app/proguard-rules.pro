@@ -15,3 +15,15 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-dontwarn butterknife.internal.**
+-keep class butterknife.internal.** {*;}
+
+-dontwarn okio.**
+#-keep okio.** {*;}
+
+-dontwarn retrofit2.**
+#-keep retrofit2.** {*;}
+
+-dontwarn rx.**
+#-keep rx.** {*;}
