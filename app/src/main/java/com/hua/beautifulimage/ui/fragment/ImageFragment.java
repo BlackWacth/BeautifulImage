@@ -23,9 +23,6 @@ import java.util.List;
 
 import butterknife.Bind;
 
-/**
- * 性感美女
- */
 @SuppressLint("ValidFragment")
 public class ImageFragment extends BaseFragment {
 
