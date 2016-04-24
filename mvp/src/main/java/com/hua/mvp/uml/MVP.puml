@@ -1,0 +1,56 @@
+@startuml
+
+interface IPresenter{
+    getViewClass() : Class<T>
+    create(Bundle saveInstance) : void
+    created(Bundle saveInstance) : void
+}
+
+class AppCompatActivity
+
+abstract class ActivityPresenterImpl{
+    mView : T
+    create(Bundle) : void
+    created(Bundle) : void
+    getViewClass() : Class<T>
+    onCreate(Bundle) : void
+}
+
+abstract class FragmentPresenterImpl{
+    mView : T
+    create(Bundle) : void
+    created(Bundle) : void
+    getViewClass() : Class<T>
+    onCreateView(LayoutInflater, ViewGroup, Bundle) : View
+}
+
+interface IView{
+    create(LayoutInflater inflater, ViewGroup container) : View 
+    created() : void
+    getLayoutId() : int 
+    findViewById(int id) : V
+    bindPresenter(IPresenter presenter) : void
+    bindEvent() : void
+}
+
+abstract class ViewImpl{
+    mPresenter : IPresenter
+    mRootView : View
+    bindPresenter(IPresenter presenter) : void
+    bindEvent() : void
+    created() : void
+    findViewById(int id) : V
+    create(LayoutInflater, ViewGroup) : View
+}
+
+IPresenter <|-- ActivityPresenterImpl
+AppCompatActivity <|-- ActivityPresenterImpl
+IPresenter <|-- FragmentPresenterImpl
+
+IView <|-- ViewImpl
+
+ActivityPresenterImpl <-* ViewImpl
+FragmentPresenterImpl <-* ViewImpl
+
+
+@enduml

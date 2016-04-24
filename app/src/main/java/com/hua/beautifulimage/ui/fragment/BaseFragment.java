@@ -30,8 +30,8 @@ public abstract class BaseFragment extends Fragment{
         if(contentView == null) {
             contentView = inflater.inflate(getLayoutId(), container, false);
             isPrepared = true;
-            ButterKnife.bind(this, contentView);
-            init();
+            
+            init(contentView);
             lazyLoad();
         }
         ViewGroup parent = (ViewGroup) contentView.getParent();
@@ -43,7 +43,7 @@ public abstract class BaseFragment extends Fragment{
 
     protected abstract int getLayoutId();
 
-    protected abstract void init();
+    protected abstract void init(View view);
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {

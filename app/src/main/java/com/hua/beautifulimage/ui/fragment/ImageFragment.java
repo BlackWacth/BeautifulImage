@@ -26,8 +26,7 @@ import butterknife.Bind;
 @SuppressLint("ValidFragment")
 public class ImageFragment extends BaseFragment {
 
-    @Bind(R.id.sexy_recycler_view)
-    RecyclerView mRecyclerView;
+    private RecyclerView mRecyclerView;
 
     private ImageRecyclerAdapter mAdapter;
     private List<Gallery.Tngou> mList;
@@ -48,7 +47,8 @@ public class ImageFragment extends BaseFragment {
     }
 
     @Override
-    protected void init() {
+    protected void init(View view) {
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.sexy_recycler_view);
         page = 1;
         if(mList == null) {
             mList = new ArrayList<>();
