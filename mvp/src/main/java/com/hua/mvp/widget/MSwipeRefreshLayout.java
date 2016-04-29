@@ -18,11 +18,37 @@ public class MSwipeRefreshLayout extends SwipeRefreshLayout {
     /**发出事件的最短距离 */
     private int mTouchSlop;
 
+    private boolean mMeasured = false;
+    private boolean mRefresh = false;
+
     public MSwipeRefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
     }
 
+    @Override
+    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if(!mMeasured) {
+            mMeasured = true;
+            setRefreshing(mRefresh);
+        }
+    }
+
+    @Override
+    public void setRefreshing(boolean refreshing) {
+        if(mMeasured) {
+            super.setRefreshing(refreshing);
+        }else {
+            mRefresh = refreshing;
+        }
+    }
+
+    /**
+     * 解决ViewPager与SwipeRefreshLayout滑动冲突
+     * @param ev
+     * @return
+     */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         int action = ev.getAction();
@@ -57,7 +83,6 @@ public class MSwipeRefreshLayout extends SwipeRefreshLayout {
             case MotionEvent.ACTION_CANCEL:
                 mDragger = false; //初始化左右滑动事件为false
                 break;
-
         }
         return super.onInterceptTouchEvent(ev);
     }

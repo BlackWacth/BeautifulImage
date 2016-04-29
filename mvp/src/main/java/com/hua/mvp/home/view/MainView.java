@@ -3,12 +3,14 @@ package com.hua.mvp.home.view;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.hua.mvp.R;
 import com.hua.mvp.base.view.ViewImpl;
-import com.hua.mvp.home.MainViewPagerAdapter;
+import com.hua.mvp.home.adapter.MainViewPagerAdapter;
 import com.hua.mvp.home.fragment.GalleryFragment;
+import com.hua.mvp.widget.MSwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,7 @@ public class MainView extends ViewImpl{
 
     private Toolbar mToolbar;
     private TabLayout mTabLayout;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private MSwipeRefreshLayout mSwipeRefreshLayout;
     private ViewPager mViewPager;
 
     private List<MainViewPagerAdapter.FragmentModel> models;
@@ -42,20 +44,47 @@ public class MainView extends ViewImpl{
 
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
 
-        initViewPager();
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mAdapter.update(mViewPager.getCurrentItem(), mSwipeRefreshLayout);
+            }
+        });
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                if (mSwipeRefreshLayout != null) {
+                    mSwipeRefreshLayout.setEnabled(state == ViewPager.SCROLL_STATE_IDLE);
+                }
+            }
+        });
     }
 
-    private void initViewPager() {
+    public void init(AppCompatActivity activity) {
+        activity.setSupportActionBar(mToolbar);
         if(models == null) {
             models = new ArrayList<>();
-            models.add(new MainViewPagerAdapter.FragmentModel("性感美女", GalleryFragment.newInstance(1)));
-            models.add(new MainViewPagerAdapter.FragmentModel("韩日美女", GalleryFragment.newInstance(2)));
-            models.add(new MainViewPagerAdapter.FragmentModel("丝袜美腿", GalleryFragment.newInstance(3)));
-            models.add(new MainViewPagerAdapter.FragmentModel("美女照片", GalleryFragment.newInstance(4)));
-            models.add(new MainViewPagerAdapter.FragmentModel("美女写真", GalleryFragment.newInstance(5)));
-            models.add(new MainViewPagerAdapter.FragmentModel("清纯美女", GalleryFragment.newInstance(6)));
-            models.add(new MainViewPagerAdapter.FragmentModel("性感车模", GalleryFragment.newInstance(7)));
+            models.add(new MainViewPagerAdapter.FragmentModel("性感美女", GalleryFragment.newInstance(mSwipeRefreshLayout, 1)));
+            models.add(new MainViewPagerAdapter.FragmentModel("韩日美女", GalleryFragment.newInstance(mSwipeRefreshLayout, 2)));
+            models.add(new MainViewPagerAdapter.FragmentModel("丝袜美腿", GalleryFragment.newInstance(mSwipeRefreshLayout, 3)));
+            models.add(new MainViewPagerAdapter.FragmentModel("美女照片", GalleryFragment.newInstance(mSwipeRefreshLayout, 4)));
+            models.add(new MainViewPagerAdapter.FragmentModel("美女写真", GalleryFragment.newInstance(mSwipeRefreshLayout, 5)));
+            models.add(new MainViewPagerAdapter.FragmentModel("清纯美女", GalleryFragment.newInstance(mSwipeRefreshLayout, 6)));
+            models.add(new MainViewPagerAdapter.FragmentModel("性感车模", GalleryFragment.newInstance(mSwipeRefreshLayout, 7)));
         }
-//        mAdapter = new MainViewPagerAdapter()
+        mAdapter = new MainViewPagerAdapter(activity.getSupportFragmentManager(), models);
+        mViewPager.setAdapter(mAdapter);
+        mTabLayout.setupWithViewPager(mViewPager);
     }
 }

@@ -18,7 +18,6 @@ import java.util.List;
 
 public class ImageRecyclerAdapter extends RecyclerView.Adapter<ImageRecyclerAdapter.ImageRecyclerHolder>{
 
-
     private Context mContext;
     private List<Gallery.Tngou> mList;
     private OnItemClickListener mOnItemClickListener;

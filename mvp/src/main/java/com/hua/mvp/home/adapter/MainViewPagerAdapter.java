@@ -1,4 +1,4 @@
-package com.hua.mvp.home;
+package com.hua.mvp.home.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -42,7 +42,7 @@ public class MainViewPagerAdapter extends FragmentStatePagerAdapter{
     }
 
     public void update(int position, SwipeRefreshLayout swipe){
-//        getCurrentFragment(position).update(swipe);
+        getCurrentFragment(position).update(swipe);
     }
 
     public static class FragmentModel {

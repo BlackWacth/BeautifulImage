@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.hua.mvp.home.activity.PictureActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/picture_app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/picture_tool_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <com.hua.mvp.widget.MSwipeRefreshLayout
+        android:id="@+id/picture_siwpe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/picture_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.hua.mvp.widget.MSwipeRefreshLayout>
+
+    <com.hua.mvp.widget.HackyViewPager
+        android:id="@+id/picture_hacky_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+</android.support.design.widget.CoordinatorLayout>

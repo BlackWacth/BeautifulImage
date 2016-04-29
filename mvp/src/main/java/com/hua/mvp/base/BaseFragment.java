@@ -15,27 +15,10 @@ import android.widget.Toast;
  */
 public abstract class BaseFragment extends Fragment{
 
-    private View containView;
-
+    protected View containView;
     protected boolean isVisible;
     protected boolean isPrepared;
     protected boolean isHasLoaded;
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(containView == null) {
-            containView = inflater.inflate(getLayoutId(), container, false);
-            isPrepared = true;
-            init(containView);
-            lazyLoad();
-        }
-        ViewGroup parent = (ViewGroup) containView.getParent();
-        if(parent != null) {
-            parent.removeView(parent);
-        }
-        return containView;
-    }
 
     /**
      * 当前Fragment是否可见，这个方法执行在Fragment生命周期之前；
@@ -52,8 +35,6 @@ public abstract class BaseFragment extends Fragment{
             isVisible = false;
             onInvisible();
         }
-
-
     }
 
     /**
@@ -81,31 +62,14 @@ public abstract class BaseFragment extends Fragment{
         load();
     }
 
-    private void init(View containView) {
-        initView(containView);
-        initData();
-    }
-
     public void showToast(String text){
         Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
     }
 
     /**
-     * 返回布局文件ID
-     * @return
+     * 初始化
      */
-    protected abstract int getLayoutId();
-
-    /**
-     * 初始化视图组件
-     * @param view 显示视图
-     */
-    protected abstract void initView(View view);
-
-    /**
-     * 初始化所需数据
-     */
-    protected abstract void initData();
+    protected abstract void init();
 
     /**
      * 加载任务
