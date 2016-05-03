@@ -3,18 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <uk.co.senab.photoview.PhotoView
+        android:id="@+id/item_hacky_photoview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"/>
+
     <ProgressBar
         android:id="@+id/item_hacky_progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
-
-    <uk.co.senab.photoview.PhotoView
-        android:id="@+id/item_hacky_photoview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:src="@mipmap/ic_launcher"
-        android:scaleType="centerCrop"/>
+        android:visibility="gone"/>
 
 </FrameLayout>

@@ -13,13 +13,13 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener;
 
 /**
- * Created by ZHONG WEI  HUA on 2016/4/15.
+ * 图片加载二次封装工具
  */
 public class ImageLoaderUtils {
 
     public static DisplayImageOptions initDisplayImageOptions() {
         DisplayImageOptions.Builder options = new DisplayImageOptions.Builder();
-        options.showImageOnLoading(R.mipmap.ic_launcher);
+//        options.showImageOnLoading(R.mipmap.ic_launcher);
         options.showImageOnFail(R.mipmap.ic_launcher);
         options.showImageForEmptyUri(R.mipmap.ic_launcher);
         options.cacheInMemory(true);
@@ -67,6 +67,5 @@ public class ImageLoaderUtils {
                 progressBar.setProgress(Math.round(100.0f * current / total));
             }
         });
-
     }
 }

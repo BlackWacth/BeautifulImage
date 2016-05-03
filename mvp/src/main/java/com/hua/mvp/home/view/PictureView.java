@@ -14,6 +14,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.hua.mvp.R;
@@ -23,6 +27,7 @@ import com.hua.mvp.home.adapter.HackyViewPagerAdapter;
 import com.hua.mvp.home.adapter.PictureAdapter;
 import com.hua.mvp.home.adapter.listener.OnItemClickListener;
 import com.hua.mvp.home.entity.Pictures;
+import com.hua.mvp.utils.L;
 import com.hua.mvp.widget.HackyViewPager;
 import com.hua.mvp.widget.MSwipeRefreshLayout;
 
@@ -39,12 +44,21 @@ public class PictureView extends ViewImpl {
     private RecyclerView mRecyclerView;
     private MSwipeRefreshLayout mSwipeRefreshLayout;
     private HackyViewPager mHackyViewPager;
+    private FrameLayout mFrameLayout;
 
     private PictureAdapter mAdapter;
 
+    private LinearLayoutManager mLinearLayoutManager;
     private AnimatorSet mAnimatorSet;
     private int animTime = 300;
 
+    private boolean isShowPicture;
+    private boolean move = false;
+    private int curreenIndex = 0;
+
+    private float scale;
+    private Rect startBounds;
+    private Rect endBounds;
     @Override
     public int getLayoutId() {
         return R.layout.activity_picture;
@@ -57,8 +71,10 @@ public class PictureView extends ViewImpl {
         mToolbar = findViewById(R.id.picture_tool_bar);
         mRecyclerView = findViewById(R.id.picture_recycler_view);
         mHackyViewPager = findViewById(R.id.picture_hacky_view_pager);
+        mFrameLayout = findViewById(R.id.picture_framelayout);
         mSwipeRefreshLayout = findViewById(R.id.picture_siwpe_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent, R.color.colorPrimary, R.color.colorPrimaryDark);
+
     }
 
     public MSwipeRefreshLayout getmSwipeRefreshLayout() {
@@ -81,9 +97,14 @@ public class PictureView extends ViewImpl {
         });
     }
 
+    public void setToolbarTitle(String title) {
+        mToolbar.setTitle(title);
+    }
+
     public void initRecyclerView(Context context, List<Pictures.Picture> list) {
         mAdapter = new PictureAdapter(context, list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mLinearLayoutManager = new LinearLayoutManager(context);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
         mAdapter.setOnItemClickListener(new OnItemClickListener<Pictures.Picture>() {
@@ -103,28 +124,30 @@ public class PictureView extends ViewImpl {
                 ((PictureActivity)mPresenter).loadPicture();
             }
         });
-
+        mRecyclerView.addOnScrollListener(new RecyclerViewListener());
     }
 
-    public void showPicture(ImageView thumbImage, List<Pictures.Picture> list, int position) {
+    public void showPicture(final ImageView thumbImage, List<Pictures.Picture> list, int position) {
 
         if(mAnimatorSet != null) {
             mAnimatorSet.cancel();
         }
+
         HackyViewPagerAdapter adapter = new HackyViewPagerAdapter(list);
         mHackyViewPager.setAdapter(adapter);
         mHackyViewPager.setCurrentItem(position);
 
-        final Rect startBounds = new Rect();
-        final Rect endBounds = new Rect();
+        startBounds = new Rect();
+        endBounds = new Rect();
         Point globalOffset = new Point();
 
         thumbImage.getGlobalVisibleRect(startBounds);
-        mHackyViewPager.getGlobalVisibleRect(endBounds, globalOffset);
+        mFrameLayout.getGlobalVisibleRect(endBounds, globalOffset);
         startBounds.offset(-globalOffset.x, -globalOffset.y);
         endBounds.offset(-globalOffset.x, -globalOffset.y);
-
-        float scale;
+        L.i("show ---> startBound = " + startBounds.toString());
+        L.i("show ---> endBounds = " + endBounds.toString());
+        L.i("offset = " + globalOffset.toString());
         if(((float)endBounds.width() / endBounds.height()) > ((float) startBounds.width() / startBounds.height())) {
             scale = (float) startBounds.height() / endBounds.height();
             float startWidth = endBounds.width() * scale;
@@ -139,40 +162,139 @@ public class PictureView extends ViewImpl {
             startBounds.bottom += deltaHeight;
         }
 
-        mHackyViewPager.setPivotX(0);
-        mHackyViewPager.setPivotY(0);
+        mFrameLayout.setPivotX(0);
+        mFrameLayout.setPivotY(0);
 
         thumbImage.setAlpha(0f);
-        mHackyViewPager.setVisibility(View.VISIBLE);
+        mFrameLayout.setVisibility(View.VISIBLE);
 
         AnimatorSet set = new AnimatorSet();
-        set.play(ObjectAnimator.ofFloat(mHackyViewPager, View.X, startBounds.left, endBounds.left))
-                .with(ObjectAnimator.ofFloat(mHackyViewPager, View.Y, startBounds.top, endBounds.top))
-                .with(ObjectAnimator.ofFloat(mHackyViewPager, View.SCALE_X, scale, 1f))
-                .with(ObjectAnimator.ofFloat(mHackyViewPager, View.SCALE_Y, scale, 1f));
+        set.play(ObjectAnimator.ofFloat(mFrameLayout, View.X, startBounds.left, endBounds.left))
+                .with(ObjectAnimator.ofFloat(mFrameLayout, View.Y, startBounds.top, endBounds.top))
+                .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_X, scale, 1f))
+                .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_Y, scale, 1f));
         set.setDuration(animTime);
         set.addListener(new AnimatorListenerAdapter() {
 
             @Override
             public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
-//                isShowPager = true;
-//                hideViews();
+                isShowPicture = true;
+                isHideAppBar(true);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-//                mAnimatorSet = null;
+                mAnimatorSet = null;
+                thumbImage.setAlpha(1f);
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
                 super.onAnimationCancel(animation);
-//                mAnimatorSet = null;
+                mAnimatorSet = null;
+                thumbImage.setAlpha(1f);
             }
         });
         set.start();
         mAnimatorSet = set;
+    }
+
+    public void closePicture() {
+        if(mAnimatorSet != null) {
+            mAnimatorSet.cancel();
+        }
+        if (!isShowPicture) {
+            return;
+        }
+//        isShowPicture = false;
+//        mFrameLayout.setVisibility(View.GONE);
+        float finalScale = scale;
+        AnimatorSet set = new AnimatorSet();
+        set.play(ObjectAnimator.ofFloat(mFrameLayout, View.X, startBounds.left))
+           .with(ObjectAnimator.ofFloat(mFrameLayout, View.Y, startBounds.top))
+           .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_X, finalScale))
+           .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_Y, finalScale));
+        set.setDuration(animTime);
+        set.addListener(new AnimatorListenerAdapter() {
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                isShowPicture = false;
+                isHideAppBar(false);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                mAnimatorSet = null;
+                mFrameLayout.setVisibility(View.GONE);
+                startBounds = null;
+                endBounds = null;
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                super.onAnimationCancel(animation);
+                mAnimatorSet = null;
+                mFrameLayout.setVisibility(View.GONE);
+                startBounds = null;
+                endBounds = null;
+            }
+        });
+        set.start();
+        mAnimatorSet = set;
+    }
+
+    public void isHideAppBar(boolean isHide) {
+        if(!isHide) {
+            mAppBarLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+        }else {
+            mAppBarLayout.animate().translationY(-mAppBarLayout.getHeight()).setInterpolator(new AccelerateInterpolator(2));
+        }
+    }
+
+    public boolean isShowPicture() {
+        return isShowPicture;
+    }
+
+    private void moveToPosition(int n) {
+        int firstItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+        int lastItem = mLinearLayoutManager.findLastVisibleItemPosition();
+        if(n <= firstItem) {
+            mRecyclerView.scrollToPosition(n);
+        }else if(n <= lastItem) {
+            int top = mRecyclerView.getChildAt(n - firstItem).getTop();
+            mRecyclerView.scrollBy(0, top);
+        }else {
+            mRecyclerView.scrollToPosition(n);
+            move = true;
+        }
+    }
+
+    class RecyclerViewListener extends RecyclerView.OnScrollListener{
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if(move){
+                move = false;
+                RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+                if(layoutManager instanceof LinearLayoutManager) {
+                    int n = curreenIndex - ((LinearLayoutManager) layoutManager).findFirstVisibleItemPosition();
+                    if(n >= 0 && n < recyclerView.getChildCount()) {
+                        int top = recyclerView.getChildAt(n).getTop();
+                        recyclerView.scrollBy(0, top);
+                    }
+                }
+            }
+
+        }
+
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+        }
     }
 }

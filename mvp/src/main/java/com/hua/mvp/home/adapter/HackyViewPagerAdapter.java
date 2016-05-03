@@ -30,6 +30,7 @@ public class HackyViewPagerAdapter extends PagerAdapter {
         PhotoView photoView = (PhotoView) view.findViewById(R.id.item_hacky_photoview);
         String url = C.ImageUrl.BASE_IMAGE_URL + mList.get(position).getSrc();
         ImageLoaderUtils.imageLoader(url, photoView, progressBar);
+        container.addView(view);
         return view;
     }
 

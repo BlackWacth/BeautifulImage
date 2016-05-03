@@ -2,6 +2,7 @@ package com.hua.mvp.home.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 
 import com.hua.mvp.base.presenter.ActivityPresenterImpl;
 import com.hua.mvp.global.C;
@@ -37,11 +38,23 @@ public class PictureActivity extends ActivityPresenterImpl<PictureView> {
         MApplication.mHttpManager.loadPicture(pictureId, mView.getmSwipeRefreshLayout(), new OnNextListener<Pictures>() {
             @Override
             public void onNext(Pictures pictures) {
+                mView.setToolbarTitle(pictures.getTitle());
                 mList.clear();
                 mList.addAll(pictures.getList());
                 mView.getmAdapter().notifyDataSetChanged();
             }
         });
+    }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if(mView.isShowPicture()) {
+                mView.closePicture();
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
