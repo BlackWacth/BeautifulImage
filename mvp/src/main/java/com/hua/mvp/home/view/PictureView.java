@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -14,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -56,9 +58,10 @@ public class PictureView extends ViewImpl {
     private boolean move = false;
     private int curreenIndex = 0;
 
-    private float scale;
-    private Rect startBounds;
-    private Rect endBounds;
+    private float finalScale;
+    private int left, top, finalLeft, finalTop;
+
+
     @Override
     public int getLayoutId() {
         return R.layout.activity_picture;
@@ -137,17 +140,26 @@ public class PictureView extends ViewImpl {
         mHackyViewPager.setAdapter(adapter);
         mHackyViewPager.setCurrentItem(position);
 
-        startBounds = new Rect();
-        endBounds = new Rect();
+        Rect startBounds = new Rect();
+        Rect endBounds = new Rect();
         Point globalOffset = new Point();
 
         thumbImage.getGlobalVisibleRect(startBounds);
         mFrameLayout.getGlobalVisibleRect(endBounds, globalOffset);
         startBounds.offset(-globalOffset.x, -globalOffset.y);
         endBounds.offset(-globalOffset.x, -globalOffset.y);
+
+        left = startBounds.left;
+        top = startBounds.top;
+        finalLeft = endBounds.left;
+        finalTop = endBounds.top;
+
         L.i("show ---> startBound = " + startBounds.toString());
         L.i("show ---> endBounds = " + endBounds.toString());
         L.i("offset = " + globalOffset.toString());
+        L.i("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+
+        final float scale;
         if(((float)endBounds.width() / endBounds.height()) > ((float) startBounds.width() / startBounds.height())) {
             scale = (float) startBounds.height() / endBounds.height();
             float startWidth = endBounds.width() * scale;
@@ -161,6 +173,9 @@ public class PictureView extends ViewImpl {
             startBounds.top -= deltaHeight;
             startBounds.bottom += deltaHeight;
         }
+        finalScale = scale;
+
+        L.i("scale = " + scale);
 
         mFrameLayout.setPivotX(0);
         mFrameLayout.setPivotY(0);
@@ -170,9 +185,9 @@ public class PictureView extends ViewImpl {
 
         AnimatorSet set = new AnimatorSet();
         set.play(ObjectAnimator.ofFloat(mFrameLayout, View.X, startBounds.left, endBounds.left))
-                .with(ObjectAnimator.ofFloat(mFrameLayout, View.Y, startBounds.top, endBounds.top))
-                .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_X, scale, 1f))
-                .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_Y, scale, 1f));
+           .with(ObjectAnimator.ofFloat(mFrameLayout, View.Y, startBounds.top, endBounds.top))
+           .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_X, scale, 1f))
+           .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_Y, scale, 1f));
         set.setDuration(animTime);
         set.addListener(new AnimatorListenerAdapter() {
 
@@ -208,14 +223,28 @@ public class PictureView extends ViewImpl {
         if (!isShowPicture) {
             return;
         }
-//        isShowPicture = false;
-//        mFrameLayout.setVisibility(View.GONE);
-        float finalScale = scale;
+
+        WindowManager windowManager = ((AppCompatActivity)mPresenter).getWindowManager();
+        int width = windowManager.getDefaultDisplay().getWidth();
+        int height = windowManager.getDefaultDisplay().getHeight();
+        mFrameLayout.setPivotX(width/2);
+        mFrameLayout.setPivotY(height/2);
+
+//        mFrameLayout.setPivotX(0);
+//        mFrameLayout.setPivotY(0);
+
+        finalScale = 0f;
+        float finalAlpha = 0.2f;
         AnimatorSet set = new AnimatorSet();
-        set.play(ObjectAnimator.ofFloat(mFrameLayout, View.X, startBounds.left))
-           .with(ObjectAnimator.ofFloat(mFrameLayout, View.Y, startBounds.top))
-           .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_X, finalScale))
-           .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_Y, finalScale));
+        set.play(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_X, finalScale))
+           .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_Y, finalScale))
+           .with(ObjectAnimator.ofFloat(mFrameLayout, View.ALPHA, finalAlpha));
+
+//        set.play(ObjectAnimator.ofFloat(mFrameLayout, View.X, left))
+//           .with(ObjectAnimator.ofFloat(mFrameLayout, View.Y, top))
+//           .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_X, finalScale))
+//           .with(ObjectAnimator.ofFloat(mFrameLayout, View.SCALE_Y, finalScale));
+
         set.setDuration(animTime);
         set.addListener(new AnimatorListenerAdapter() {
 
@@ -231,8 +260,11 @@ public class PictureView extends ViewImpl {
                 super.onAnimationEnd(animation);
                 mAnimatorSet = null;
                 mFrameLayout.setVisibility(View.GONE);
-                startBounds = null;
-                endBounds = null;
+                mFrameLayout.setAlpha(1f);
+                mFrameLayout.setScaleX(1f);
+                mFrameLayout.setScaleY(1f);
+                mFrameLayout.setX(finalLeft);
+                mFrameLayout.setY(finalTop);
             }
 
             @Override
@@ -240,8 +272,11 @@ public class PictureView extends ViewImpl {
                 super.onAnimationCancel(animation);
                 mAnimatorSet = null;
                 mFrameLayout.setVisibility(View.GONE);
-                startBounds = null;
-                endBounds = null;
+                mFrameLayout.setAlpha(1f);
+                mFrameLayout.setScaleX(1f);
+                mFrameLayout.setScaleY(1f);
+                mFrameLayout.setX(finalLeft);
+                mFrameLayout.setY(finalTop);
             }
         });
         set.start();

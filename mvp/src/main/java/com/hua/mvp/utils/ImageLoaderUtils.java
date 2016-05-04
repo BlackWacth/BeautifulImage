@@ -19,7 +19,7 @@ public class ImageLoaderUtils {
 
     public static DisplayImageOptions initDisplayImageOptions() {
         DisplayImageOptions.Builder options = new DisplayImageOptions.Builder();
-//        options.showImageOnLoading(R.mipmap.ic_launcher);
+        options.showImageOnLoading(R.mipmap.img01);
         options.showImageOnFail(R.mipmap.ic_launcher);
         options.showImageForEmptyUri(R.mipmap.ic_launcher);
         options.cacheInMemory(true);
